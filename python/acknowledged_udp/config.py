@@ -25,8 +25,8 @@ class Config(DefaultConfig):
     Class to hold and load the global network configurations.
     """
 
-    def __init__(self):
-        super(Config, self).__init__(DEFAULT_CONFIG)
+    def __init__(self, logger_object=None):
+        super(Config, self).__init__(DEFAULT_CONFIG, logger_object)
         self.load(CONFIG_FILE)
         if self.get_config_value("TYPE") != "NETWORK_CONFIG":
             raise ConfigError("Type should be NETWORK_CONFIG for network configuration. "
@@ -39,4 +39,4 @@ class Config(DefaultConfig):
 
 
 # This variable holds the global configuration parameters for the statemachine
-global_network_config = Config()
+global_network_config = Config(logger)
