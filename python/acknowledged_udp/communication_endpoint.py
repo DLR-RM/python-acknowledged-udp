@@ -232,3 +232,6 @@ class CommunicationEndpoint(DatagramProtocol):
 
     def shutdown(self):
         self.__shutdown = True
+
+communication_endpoint = CommunicationEndpoint()
+

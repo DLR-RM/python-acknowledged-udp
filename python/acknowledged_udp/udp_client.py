@@ -26,9 +26,8 @@ class UdpClient(CommunicationEndpoint):
         logger.info("Protocol started")
 
     def stopProtocol(self):
-        pass
-        # CommunicationEndpoint.stopProtocol(self)
         # logger.warn("Protocol stopped")
+        pass
 
     @staticmethod
     def print_message(message, address):

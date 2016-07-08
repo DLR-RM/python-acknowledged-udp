@@ -10,6 +10,9 @@ class MessageType(Enum):
     COMMAND = 3
     REGISTER = 4
     REGISTER_WITH_ACKNOWLEDGES = 5
+    UNREGISTER = 6
+    DISABLE = 7
+    ID = 8
 
 STATE_EXECUTION_STATUS_SEPARATOR = "@"
 
@@ -29,7 +32,6 @@ def generate_sequence_number():
 class Protocol:
 
     def __init__(self, message_type=None, message_content="", datagram=None):
-
         self.__checksum = None
         self.checksum = None
         self.__message_type = None
@@ -60,6 +62,7 @@ class Protocol:
     def deserialize(self, datagram):
         try:
             checksum, salt, sequence_number, message_type, message_content = datagram.split(":")
+
         except Exception, e:
             raise AttributeError("datagram {0} could not be deserialized".format(datagram))
 
