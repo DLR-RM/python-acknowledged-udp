@@ -52,9 +52,9 @@ class CommunicationEndpoint(DatagramProtocol):
             self._new_message_cv.acquire()
             while True:
                 self._new_message_cv.wait(CHECK_ACKNOWLEDGEMENTS_THREAD_MAX_WAIT_TIME)
-                if len(self._acknowledge_messages_address_couples) > 0 or len(self._messages_to_be_acknowledged) > 0:
+                if len(self._acknowledge_messages_address_couples) > 0 or len(self._messages_to_be_acknowledged) > 0:  # changed or into and
                     break
-
+            # print "active"
             if len(self._acknowledge_messages_address_couples) > 0:
                 next_message, address = self._acknowledge_messages_address_couples.pop()
                 assert isinstance(next_message, Protocol)
@@ -96,7 +96,7 @@ class CommunicationEndpoint(DatagramProtocol):
                     self._message_events[t_message.checksum].set()
 
     def datagramReceived(self, datagram, address):
-
+        # logger.info("datagram received triggered")
         # parsing message
         try:
             protocol = Protocol(datagram=datagram)
@@ -104,7 +104,7 @@ class CommunicationEndpoint(DatagramProtocol):
             import traceback
             logger.error("Received message could not be deserialized: {0} {1}".format(e.message, traceback.format_exc()))
 
-        # logger.info(" --------------- receiving message {0} from address {1}".format(str(protocol), str(address)))
+        logger.info(" --------------- receiving message {0} from address {1}".format(str(protocol), str(address)))
 
         # throwing away messages that were received before
         if protocol.checksum not in self._message_history_dictionary.iterkeys():
@@ -118,7 +118,6 @@ class CommunicationEndpoint(DatagramProtocol):
             # custom function
             self.datagram_received_function(protocol, address)
         else:
-            # logger.info("Message was already received!")
             return
 
         # registering endpoints
@@ -134,6 +133,22 @@ class CommunicationEndpoint(DatagramProtocol):
             ack_message = Protocol(MessageType.ACK, protocol.checksum)
             self.send_message_non_acknowledged(ack_message, address)
 
+        if protocol.message_type is MessageType.UNREGISTER:
+            # if address not in self._registered_endpoints_for_acknowledgements:
+            #     print "not in _registered_endpoints_for_acknowledgements"
+            #     self._registered_endpoints_for_acknowledgements.append(address)
+            logger.info("Received UNREGISTER message {0} from endpoint. Sending ACK message back ... {1}".format(protocol, protocol.checksum))
+            ack_message = Protocol(MessageType.ACK, protocol.checksum)
+            self.send_message_non_acknowledged(ack_message, address)
+
+        if protocol.message_type is MessageType.DISABLE:
+            # if address not in self._registered_endpoints_for_acknowledgements:
+            #     print "not in _registered_endpoints_for_acknowledgements"
+            #     self._registered_endpoints_for_acknowledgements.append(address)
+            logger.info("Received DISABLING message {0} from endpoint. Sending ACK message back ... {1}".format(protocol, protocol.checksum))
+            ack_message = Protocol(MessageType.ACK, protocol.checksum)
+            self.send_message_non_acknowledged(ack_message, address)
+
         # add the acknowledge message to its responsible list and wake up the thread checking the acknowledgements
         if protocol.message_type is MessageType.ACK:
             self._new_message_cv.acquire()
@@ -141,10 +156,12 @@ class CommunicationEndpoint(DatagramProtocol):
             # the message that is acknowledged is in the message_content field
             logger.info("Received ACK message {0} from endpoint.".format(protocol))
             logger.info("set the threading.Event for the message checksum {0}".format(protocol.message_content))
+
             if protocol.message_content in self._message_events.iterkeys():
                 self._message_events[protocol.message_content].set()
             self._new_message_cv.notify()
             self._new_message_cv.release()
+
         else:  # acknowledge message if endpoint registered for acknowledgements
             if address in self._registered_endpoints_for_acknowledgements:
                 ack_message = Protocol(MessageType.ACK, protocol.checksum)
@@ -167,17 +184,16 @@ class CommunicationEndpoint(DatagramProtocol):
         assert isinstance(message, Protocol)
         self._messages_to_be_acknowledged[message.checksum] = (message, address)
         self._messages_to_be_acknowledged_timeout[message.checksum] = 0
-
         if blocking:
             self._message_events[message.checksum] = threading.Event()
             # logger.info(" -------------- creating threading event for message {0}".format(str(message)))
             # make sure that the threading event is created before the message is sent out
             # else there will be race condition
+            logger.info("Created threading.Event for message with checksum {0}".format(str(message.checksum)))
             successfully_sent = self.send_message_non_acknowledged(message, address)
             if not successfully_sent:
                 logger.error("Failed sending message!")
                 return False
-            logger.info("Created threading.Event for message with checksum {0}".format(str(message.checksum)))
             return_value = self._message_events[message.checksum].wait(
                 global_network_config.get_config_value("MAX_TIME_WAITING_FOR_ACKNOWLEDGEMENTS") * 3)
             del self._message_events[message.checksum]
@@ -231,7 +247,7 @@ class CommunicationEndpoint(DatagramProtocol):
         pass
 
     def shutdown(self):
-        self.__shutdown = True
+        pass
 
 communication_endpoint = CommunicationEndpoint()
 
