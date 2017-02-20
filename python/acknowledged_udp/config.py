@@ -26,7 +26,7 @@ class Config(DefaultConfig):
     """
 
     def __init__(self, logger_object=None):
-        super(Config, self).__init__(DEFAULT_CONFIG, logger_object)
+        super(Config, self).__init__(DEFAULT_CONFIG, logger_object, rel_config_path='rafcon')
         self.load(CONFIG_FILE)
         if self.get_config_value("TYPE") != "NETWORK_CONFIG":
             raise ConfigError("Type should be NETWORK_CONFIG for network configuration. "
