@@ -7,6 +7,5 @@ doc:
 doc_dir: ''
 
 test:
-  - export PYTHONPATH=$PYTHONPATH:/volume/software/common/packages/python_yaml_configuration/latest/lib/python2.7
   - pytest python/acknowledged_udp/test_acknowledged_messages.py
   - pytest python/acknowledged_udp/test_non_acknowledged_messages.py
