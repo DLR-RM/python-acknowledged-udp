@@ -5,7 +5,7 @@ DESCRIPTION         = This module offers secure connection over the unsecure UDP
 DOCUMENTATION       = http://www.google.de
 SUPPORTED_LANGUAGES = python
 DEPENDS =
-DEPENDS.osl*        = python_yaml_configuration==0
+DEPENDS.osl*        = python_yaml_configuration==0, rafcon==0
 
 ARCHS               = osl42-x86_64
 PYTHON_PATHS        = ${PKGROOT}/lib/python2.7
