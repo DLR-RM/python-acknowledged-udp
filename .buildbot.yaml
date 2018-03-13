@@ -1,0 +1,11 @@
+arch:
+  - 'osl42-x86_64'
+
+doc:
+  - echo "No documentation to build"
+
+doc_dir: ''
+
+test:
+  - pytest python/acknowledged_udp/test_acknowledged_messages.py
+  - pytest python/acknowledged_udp/test_non_acknowledged_messages.py
