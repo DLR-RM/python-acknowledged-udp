@@ -1,5 +1,5 @@
 
-from protocol import Protocol, MessageType
+from acknowledged_udp.protocol import Protocol, MessageType
 
 
 def test_protocol():

@@ -10,7 +10,7 @@ from twisted.internet import reactor
 
 from acknowledged_udp.udp_client import UdpClient
 from acknowledged_udp.udp_server import UdpServer
-from config import global_network_config
+from acknowledged_udp.config import global_network_config
 from acknowledged_udp.protocol import Protocol, MessageType
 
 from test_non_acknowledged_messages import wait_for_test_finished
